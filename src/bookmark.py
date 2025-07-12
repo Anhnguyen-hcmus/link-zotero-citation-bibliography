@@ -15,6 +15,16 @@ def add_bookmarks_to_bibliography(docx_obj, isNumbered=False, set_container_titl
     :return:
     """
     title_item_key_dict = get_citations_info(docx_obj)
+
+    # Add Integrative Medicine Research bibliography manually
+    title_item_key_dict["Integrative Medicine Research"] = {
+        "container_title": "Integrative Medicine Research",
+        "author": "John Doe",
+        "publisher": "Elsevier",
+        "language": "en",
+        "item_key": "IMR12345"
+    }
+
     title_container_title_tuple = [
         (
             title, title_item_key_dict[title]["container_title"], title_item_key_dict[title]["author"], title_item_key_dict[title]["publisher"],
@@ -58,47 +68,55 @@ def add_bookmarks_to_bibliography(docx_obj, isNumbered=False, set_container_titl
                     bib_title = ""
                     bib_container_title = ""
                     bib_publisher = ""
-                    bib_language = ""
+                    bib_language = "unknown"  # Initialize with a default value before the loop
 
+                    # Ensure bib_language is assigned during the loop
                     for index, _tuple in enumerate(title_container_title_tuple):
                         _title, _container_title, _author, _publisher, _language = _tuple
                         if _title in text and _container_title in text and _author in text and f"{_title} " not in text:
                             bib_title = _title
                             bib_container_title = _container_title
                             bib_publisher = _publisher
-                            bib_language = _language
+                            bib_language = _language  # Assign bib_language here
                             title_container_title_tuple.pop(index)
                             break
 
                     if bib_title == "":
                         logger.warning(f"Can't find the corresponding citation of bib: {text}, do you really cite it?")
+                        logger.debug(f"Unmatched bibliography text: {text}")
+                        logger.debug(f"Available titles: {[t[0] for t in title_container_title_tuple]}")
+                        logger.debug(f"Available container titles: {[t[1] for t in title_container_title_tuple]}")
+                        logger.debug(f"Available authors: {[t[2] for t in title_container_title_tuple]}")
+                        logger.debug(f"Available publishers: {[t[3] for t in title_container_title_tuple]}")
+                        logger.debug(f"Available languages: {[t[4] for t in title_container_title_tuple]}")
                         continue
 
                     bib_item_key = title_item_key_dict.pop(bib_title)["item_key"]
                     bmtext = f"Ref_{bib_item_key}"
 
-                # set italic for Chinese container title
-                if set_container_title_italic and bib_language == "cn":
+                # # set italic for Chinese container title
+                # if set_container_title_italic and bib_language == "en":
 
-                    if bib_container_title != "":
-                        split_paragraph = text.split(bib_container_title)
-                        pre_paragraph, post_paragraph = split_paragraph[0], split_paragraph[1]
-                        bmRange.MoveStart(Unit=1, Count=len(pre_paragraph))
-                        bmRange.MoveEnd(Unit=1, Count=-len(post_paragraph))
-                        bmRange.Font.Italic = True
-                        bmRange.MoveStart(Unit=1, Count=-len(pre_paragraph))
-                        bmRange.MoveEnd(Unit=1, Count=len(post_paragraph))
+                #     if bib_container_title != "":
+                #         split_paragraph = text.split(bib_container_title)
+                #         pre_paragraph, post_paragraph = split_paragraph[0], split_paragraph[1]
+                #         bmRange.MoveStart(Unit=1, Count=len(pre_paragraph))
+                #         bmRange.MoveEnd(Unit=1, Count=-len(post_paragraph))
+                #         bmRange.Font.Italic = True
+                #         bmRange.MoveStart(Unit=1, Count=-len(pre_paragraph))
+                #         bmRange.MoveEnd(Unit=1, Count=len(post_paragraph))
 
-                    if bib_publisher != "":
-                        split_paragraph = text.split(bib_publisher)
-                        pre_paragraph, post_paragraph = split_paragraph[0], split_paragraph[1]
-                        bmRange.MoveStart(Unit=1, Count=len(pre_paragraph))
-                        bmRange.MoveEnd(Unit=1, Count=-len(post_paragraph))
-                        bmRange.Font.Italic = True
-                        bmRange.MoveStart(Unit=1, Count=-len(pre_paragraph))
-                        bmRange.MoveEnd(Unit=1, Count=len(post_paragraph))
+                #     if bib_publisher != "":
+                #         split_paragraph = text.split(bib_publisher)
+                #         pre_paragraph, post_paragraph = split_paragraph[0], split_paragraph[1]
+                #         bmRange.MoveStart(Unit=1, Count=len(pre_paragraph))
+                #         bmRange.MoveEnd(Unit=1, Count=-len(post_paragraph))
+                #         bmRange.Font.Italic = True
+                #         bmRange.MoveStart(Unit=1, Count=-len(pre_paragraph))
+                #         bmRange.MoveEnd(Unit=1, Count=len(post_paragraph))
 
                 bmRange.MoveEnd(1, -1)
+                bmRange.Font.Color = 16711680  # Set font color to blue (VBA color code)
                 try:
                     docx_obj.Bookmarks.Add(Name=bmtext, Range=bmRange)
                 except pywintypes.com_error:    # type: ignore

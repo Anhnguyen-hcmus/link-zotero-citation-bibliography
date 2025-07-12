@@ -11,8 +11,7 @@ from .utils import logger
 from .zotero import init_zotero_client
 
 
-def run(word_file_path: str, new_file_path: str, zotero_id: str, zotero_api_key: str, isNumbered=False, setColor: int = None, noUnderLine=True,
-        set_container_title_italic=True):
+def run(word_file_path: str, new_file_path: str, zotero_id: str, zotero_api_key: str, isNumbered: bool = False, setColor: int = None, noUnderLine: bool = True, set_container_title_italic: bool = True):
     """
     Main entry.
 
