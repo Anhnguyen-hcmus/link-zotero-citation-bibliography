@@ -6,7 +6,7 @@ from .utils import logger
 ZOTERO_CLIENT: Zotero | None = None
 
 
-def init_zotero_client(zotero_id: str, zotero_api_key: str, force=False):
+def init_zotero_client(zotero_id: str, zotero_api_key: str, force: bool = False):
     """
     Initial the client to Zotero.
 
