@@ -62,11 +62,14 @@ def get_citations_info(docx_obj) -> dict[str, dict[str, str]]:
                         else:
                             language = "en"
 
-                    author = _citation["itemData"]["author"][0]
-                    if "family" in author:
-                        author = author["family"]
+                    if "author" not in _citation["itemData"] or not _citation["itemData"]["author"]:
+                        author = "Unknown Author"
                     else:
-                        author = author["literal"]
+                        author = _citation["itemData"]["author"][0]
+                        if "family" in author:
+                            author = author["family"]
+                        else:
+                            author = author["literal"]
 
                     if title not in titles_item_keys:
                         titles_item_keys[title] = {
